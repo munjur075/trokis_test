@@ -1,0 +1,102 @@
+Need to dessign model for Errands Service...:
+
+    - describe your Errands details
+    - let provider decide location eaithr select or not select
+    - enter location 
+    - address_line_2
+    - name
+    - phone Number
+    - when do you need it?
+        right now
+        for later
+    - select date       - time
+
+                + add another Errand
+    - Select payment method
+
+    ------------------------------------------------------
+    from django.db import models
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
+
+# Optional: Enum for payment methods
+class PaymentMethod(models.TextChoices):
+    CASH = 'cash', 'Cash'
+    CARD = 'card', 'Card'
+    ONLINE = 'online', 'Online'
+
+# Optional: Enum for scheduling
+class ScheduleType(models.TextChoices):
+    NOW = 'now', 'Right Now'
+    LATER = 'later', 'For Later'
+
+# Main service request
+class ErrandService(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='errand_services')
+    schedule_type = models.CharField(max_length=10, choices=ScheduleType.choices)
+    scheduled_date = models.DateField(blank=True, null=True)
+    scheduled_time = models.TimeField(blank=True, null=True)
+    payment_method = models.CharField(max_length=20, choices=PaymentMethod.choices)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"ErrandService #{self.id} by {self.user}"
+
+# Each individual errand
+class ErrandItem(models.Model):
+    service = models.ForeignKey(ErrandService, on_delete=models.CASCADE, related_name='errand_items')
+    
+    # Task description
+    description = models.TextField()
+
+    # Who chooses location
+    provider_selects_location = models.BooleanField(default=False)
+
+    # Customer-provided location (optional if provider selects)
+    location = models.CharField(max_length=255, blank=True, null=True)
+    address_line_2 = models.CharField(max_length=255, blank=True, null=True)
+
+    # Contact details
+    contact_name = models.CharField(max_length=100)
+    contact_phone = models.CharField(max_length=20)
+
+    def __str__(self):
+        return f"Errand for {self.contact_name} ({self.service_id})"
+
+
+----------------------------------------------------
+from django.contrib import admin
+from .models import ErrandService, ErrandItem
+
+
+# Inline display of each errand item within the service
+class ErrandItemInline(admin.StackedInline):
+    model = ErrandItem
+    extra = 0
+    fields = (
+        'description',
+        'provider_selects_location',
+        'location',
+        'address_line_2',
+        'contact_name',
+        'contact_phone',
+    )
+
+
+@admin.register(ErrandService)
+class ErrandServiceAdmin(admin.ModelAdmin):
+    list_display = ('id', 'user', 'schedule_type', 'scheduled_date', 'scheduled_time', 'payment_method', 'created_at')
+    list_filter = ('schedule_type', 'payment_method', 'created_at')
+    search_fields = ('user__username', 'user__mobile_number')  # adjust based on your user model
+    inlines = [ErrandItemInline]
+    ordering = ('-created_at',)
+
+
+@admin.register(ErrandItem)
+class ErrandItemAdmin(admin.ModelAdmin):
+    list_display = ('id', 'service', 'description', 'contact_name', 'provider_selects_location')
+    search_fields = ('description', 'contact_name', 'contact_phone', 'location')
+    list_filter = ('provider_selects_location',)
+
+
