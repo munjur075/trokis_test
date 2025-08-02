@@ -3,7 +3,7 @@ from .models import BigItemService, BigItemStop
 
 class BigItemStopInline(admin.TabularInline):
     model = BigItemStop
-    extra = 1
+    extra = 0
 
 @admin.register(BigItemService)
 class BigItemServiceAdmin(admin.ModelAdmin):

@@ -5,7 +5,7 @@ from .models import ErrandService, ErrandItem
 # Inline display of each errand item within the service
 class ErrandItemInline(admin.StackedInline):
     model = ErrandItem
-    extra = 1
+    extra = 0
     fields = (
         'description',
         'provider_selects_location',
