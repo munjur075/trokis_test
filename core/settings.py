@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     'payments',
     'helpers',
     'line_waiting',
+    'moto_rides',
 ]
 
 AUTH_USER_MODEL = 'accounts.User'
