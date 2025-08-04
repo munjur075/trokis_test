@@ -12,17 +12,14 @@ class UserSerializer(serializers.ModelSerializer):
 
 class SendOTPSerializer(serializers.Serializer):
     mobile_number = serializers.CharField(max_length=20)
-    role = serializers.ChoiceField(choices=User.ROLE_CHOICES)
 
 class VerifyOTPSerializer(serializers.Serializer):
     mobile_number = serializers.CharField(max_length=20)
-    otp = serializers.IntegerField(min_value=100000, max_value=999999)
-    role = serializers.ChoiceField(choices=User.ROLE_CHOICES)
-
+    verification_code = serializers.IntegerField(min_value=100000, max_value=999999)
+    
     def validate(self, data):
         mobile_number = data['mobile_number']
-        otp = str(data['otp'])
-        role = data['role']
+        otp = str(data['verification_code'])
 
         try:
             user = User.objects.get(mobile_number=mobile_number)
@@ -31,10 +28,9 @@ class VerifyOTPSerializer(serializers.Serializer):
 
         if user.otp != otp:
             raise serializers.ValidationError("Incorrect OTP.")
+        
         if user.otp_expired and timezone.now() > user.otp_expired:
             raise serializers.ValidationError("OTP has expired.")
-        if user.role != role:
-            raise serializers.ValidationError("Role mismatch.")
 
         return data
     

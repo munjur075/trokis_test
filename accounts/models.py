@@ -1,6 +1,7 @@
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, BaseUserManager
 from django.db import models
 from django.utils import timezone
+import uuid
 
 class UserManager(BaseUserManager):
     def create_user(self, mobile_number, password=None, **extra_fields):
@@ -46,6 +47,11 @@ class User(AbstractBaseUser, PermissionsMixin):
         ('driver', 'Driver'),
         ('user', 'User'),
         ('guest', 'Guest'),
+    )
+    id = models.UUIDField(
+        primary_key=True,
+        default=uuid.uuid4,
+        editable=False
     )
 
     mobile_number = models.CharField(max_length=15, unique=True)

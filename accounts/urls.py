@@ -5,11 +5,12 @@ from .views import (
 )
 
 urlpatterns = [
-    path('signup/', SignupView.as_view(), name='signup'),
-    path('send-otp-login/', send_otp_login, name='send_otp_login'),
-    path('verify-login/', VerifyLoginView.as_view(), name='verify_login'),
+    path('sign-up/', SignupView.as_view(), name='sign-up'),
+    path('verify-number/', verify_otp, name='verify-number'),
+    path('resend-verification-code/', send_otp, name='resend-verification-code'),
+
+    path('sign-in/', send_otp_login, name='sign-in'),
+    path('verify-sign-in/', VerifyLoginView.as_view(), name='verify-sign-in'),
     path('admin-login/', AdminLoginView.as_view(), name='admin_login'),
-    path('send-otp/', send_otp, name='send_otp'),
-    path('verify-number/', verify_otp, name='verify_number'),
     path('get-user-profile/', UserProfileView.as_view(), name='user_profile'),
 ]
